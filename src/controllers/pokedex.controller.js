@@ -43,9 +43,21 @@ const controllerPokedexRemove = async (req, res) => {
 	}
 }
 
+const controllerPokedexClear = async (req, res) => {
+	try {
+		await Pokedex.deleteOne({ user: req.user._id })
+
+		res.status(204).json()
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({ message: 'An error has occurred.' })
+	}
+}
+
 module.exports = {
 	controllerPokedexGet,
 	controllerPokedexAdd,
 	controllerPokedexRemove,
+	controllerPokedexClear,
 	pokedexToJson,
 }

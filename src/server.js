@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 const startServer = require('./config/server')
 require('dotenv').config()
 
@@ -11,6 +12,11 @@ require('./database')
 const server = express()
 
 // Middleware
+server.use(
+	cors({
+		origin: 'http://dev.vadn:8080',
+	})
+)
 server.use(express.json())
 server.use('/static', express.static('./static'))
 
