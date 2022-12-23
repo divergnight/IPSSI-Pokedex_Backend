@@ -14,7 +14,7 @@ const server = express()
 // Middleware
 server.use(
 	cors({
-		origin: 'http://dev.vadn:8080',
+		origin: 'http://localhost:8080',
 	})
 )
 server.use(express.json())
