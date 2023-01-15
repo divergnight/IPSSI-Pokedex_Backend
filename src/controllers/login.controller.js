@@ -1,15 +1,16 @@
 const User = require('../models/user.models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { SECRET } = require('.')
+const { SECRET, NODE_ENV } = require('.')
 
 function genToken(id) {
+	const expiresIn = NODE_ENV === 'production' ? '6 hours' : '72 hours'
 	return jwt.sign(
 		{
 			id: id,
 		},
 		SECRET,
-		{ expiresIn: '3 hours' }
+		{ expiresIn: expiresIn }
 	)
 }
 
@@ -30,6 +31,7 @@ const controllerUserLogin = async (req, res) => {
 				res.status(200).json({
 					username: login,
 					token: token,
+					piece: user.piece,
 				})
 			} else {
 				res.status(401).json({
@@ -61,6 +63,7 @@ const controllerUserRegister = async (req, res) => {
 		res.status(201).json({
 			username: login,
 			token: token,
+			piece: user.piece,
 		})
 	} catch (error) {
 		console.log(error)

@@ -47,4 +47,29 @@ const isAuthenticated = async (req, res, next) => {
 	}
 }
 
-module.exports = isAuthenticated
+const verifyClient = (info, cb) => {
+	const protocols = info.req.headers['sec-websocket-protocol']?.split(', ') ?? []
+	let token = !!protocols.length ? protocols[protocols.indexOf('access_token') + 1] : null
+
+	if (!token) {
+		cb(false, 401, 'Unauthorized')
+	} else {
+		if (token.startsWith('Bearer ')) {
+			token = token.slice(7, token.length)
+		}
+		jwt.verify(token, process.env.SECRET, (err, decoded) => {
+			if (err) {
+				cb(false, 401, 'Unauthorized')
+			} else {
+				if (decoded.exp * 1000 < Date.now()) {
+					cb(false, 401, 'Unauthorized')
+				}
+
+				info.req.user = decoded
+				cb(true)
+			}
+		})
+	}
+}
+
+module.exports = { isAuthenticated, verifyClient }

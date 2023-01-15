@@ -1,7 +1,19 @@
-const express = require('express')
-const cors = require('cors')
-const startServer = require('./config/server')
 require('dotenv').config()
+const CORS_ORIGIN = process.env.CORS_ORIGIN
+
+const { verifyClient } = require('./middlewares/auth.middleware')
+
+const express = require('express')
+const app = express()
+const [server, port] = require('./config/server')(app)
+
+const wsExpress = require('express-ws')(app, server, {
+	wsOptions: {
+		verifyClient: verifyClient,
+	},
+})
+
+const cors = require('cors')
 
 const error_handler = require('./middlewares/error_handler.middleware')
 const routes = require('./routes')
@@ -9,22 +21,22 @@ const routes = require('./routes')
 // Start database connection
 require('./database')
 
-const server = express()
-
 // Middleware
-server.use(
+app.use(
 	cors({
-		origin: 'http://localhost:8080',
+		origin: CORS_ORIGIN,
 	})
 )
-server.use(express.json())
-server.use('/static', express.static('./static'))
+app.use(express.json())
+app.use('/static', express.static('./static'))
 
 // Error handler middleware
-server.use(error_handler)
+app.use(error_handler)
 
 // Endpoints
-server.use('/', routes)
+app.use('/', routes)
 
 // Run server
-startServer(server)
+server.listen(port, () => {
+	console.log('Server running')
+})

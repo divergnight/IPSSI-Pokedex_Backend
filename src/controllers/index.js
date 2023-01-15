@@ -1,7 +1,8 @@
 require('dotenv').config()
 
-const SECRET = process.env.SECRET
+const { SECRET, NODE_ENV } = process.env
 
 module.exports = {
 	SECRET,
+	NODE_ENV,
 }
